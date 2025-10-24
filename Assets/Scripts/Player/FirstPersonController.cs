@@ -22,7 +22,6 @@ public class FirstPersonController : MonoBehaviour
     private Vector2 _moveInput;
     private Vector2 _lookInput;
     private float _xRotation = 0f;
-
     private Vector3 _velocity; // para gravedad
 
     private void Awake()
@@ -43,14 +42,14 @@ public class FirstPersonController : MonoBehaviour
     {
         _inputActions.Player.Enable();
 
-        // Move
+        // Suscripciones
         _inputActions.Player.Move.performed += OnMoveInput;
         _inputActions.Player.Move.canceled += OnMoveInput;
 
-        // Look  (corrección: antes estabas usando Move)
         _inputActions.Player.Look.performed += OnLookInput;
         _inputActions.Player.Look.canceled += OnLookInput;
 
+        // Cursor controlado por el UIManager
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
     }
@@ -71,6 +70,10 @@ public class FirstPersonController : MonoBehaviour
 
     private void Update()
     {
+        // Si el UIManager existe y los controles están deshabilitados, no procesar input.
+        if (UIManager.Instance != null && !UIManager.Instance.IsPlayerInputEnabled)
+            return;
+
         HandleLook();
         HandleMovement();
     }
@@ -97,10 +100,12 @@ public class FirstPersonController : MonoBehaviour
         // gravedad simple
         if (_characterController.isGrounded)
         {
-            if (_velocity.y < 0) _velocity.y = -2f; // pegado al suelo
-            // si quisieras salto:
-            // if (_inputActions.Player.Jump.WasPerformedThisFrame()) _velocity.y = Mathf.Sqrt(_jumpForce * -2f * _gravity);
+            if (_velocity.y < 0) _velocity.y = -2f;
+            // Si quisieras salto:
+            // if (_inputActions.Player.Jump.WasPerformedThisFrame()) 
+            //     _velocity.y = Mathf.Sqrt(_jumpForce * -2f * _gravity);
         }
+
         _velocity.y += _gravity * Time.deltaTime;
 
         // mover
@@ -109,15 +114,15 @@ public class FirstPersonController : MonoBehaviour
 
     private void HandleLook()
     {
-        // NOTA: para Input System (delta), evita multiplicar por Time.deltaTime
+        // Input System entrega delta directamente (no usar Time.deltaTime aquí)
         float mouseX = _lookInput.x * _mouseSensitivity;
         float mouseY = _lookInput.y * _mouseSensitivity;
 
-        // Yaw (girar cuerpo)
+        // Rotación del cuerpo (yaw)
         transform.Rotate(Vector3.up * mouseX);
 
-        // Pitch (girar cámara)
-        _xRotation -= mouseY; // invierte si prefieres estilo distinto (usar +=)
+        // Rotación vertical de la cámara (pitch)
+        _xRotation -= mouseY;
         _xRotation = Mathf.Clamp(_xRotation, -_verticalLookLimit, _verticalLookLimit);
         _cameraTransform.localRotation = Quaternion.Euler(_xRotation, 0f, 0f);
     }
