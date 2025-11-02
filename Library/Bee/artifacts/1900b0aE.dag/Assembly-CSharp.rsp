@@ -366,6 +366,8 @@
 "Assets/Scripts/Core/IInteractable.cs"
 "Assets/Scripts/Core/LootChestController.cs"
 "Assets/Scripts/Core/TerminalController.cs"
+"Assets/Scripts/Managers/GameEvents.cs"
+"Assets/Scripts/Managers/GameManager.cs"
 "Assets/Scripts/Player/FirstPersonController.cs"
 "Assets/Scripts/Player/PlayerInteractor.cs"
 "Assets/Scripts/UI/InGameState.cs"
